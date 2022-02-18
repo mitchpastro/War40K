@@ -4,6 +4,7 @@
 #include <time.h>           // time
 #include <vector>           // vector<type>
 #include <numeric>          // accumulate 
+#include <unordered_map>    // unordered_map<type,type>
 
 // Class for individual models
 class Model {
@@ -185,24 +186,28 @@ float W_attack(Model Model_att, Weapon Weapon_att, Model Model_def, std::vector<
 
 
 int main() {
-    // endl to space out console
-    std::cout<<std::endl;
-    std::cout<<std::endl;
-    std::cout<<std::endl;
-    std::cout<<std::endl;
-    std::cout<<std::endl;
-        
+
     // create models
-    Model Marine(6,3,3,4,4,2,2,7,3);
-    int Marine_no = 5;
-    Model Necron(5,3,3,4,4,1,1,10,4);
-    int Necron_no = 10;
-    Model Guardsman(6,4,4,3,3,1,1,6,5);
-    int Guardsman_no = 10;
+    std::unordered_map<std::string, Model> Model_map;
     
-    // creat weapons
+    Model Marine(6,3,3,4,4,2,2,7,3);
+    Model Necron(5,3,3,4,4,1,1,10,4);
+    Model Guardsman(6,4,4,3,3,1,1,6,5);
+    
+    int Marine_no = 5;
+
+    Model_map["Marine"] = Marine;
+    Model_map["Necron"] = Necron;
+    Model_map["Guardsman"] = Guardsman;
+    
+    // create weapons
+    std::unordered_map<std::string, Weapon> Weapon_map;
+    
     Weapon CCW(0,'M',"U",0,1);
-    Weapon Astartes_chainwsord(0,'M',"U",-1,1);
+    Weapon Astartes_chainsword(0,'M',"U",-1,1);
+    Weapon_map["CCW"] = CCW;
+    Weapon_map["Astartes_chainsword"] = Astartes_chainsword;
+    
 
     // init vals
     std::vector<int> prob;             // {{attacks} {hits} {wounds} {saves} {damage}}
@@ -214,17 +219,66 @@ int main() {
     float no_of_sav;
     float sum_of_dam;
     float arr_of_dam[Marine_no];
+    Model Model_att;
+    Weapon Weapon_att;
+    Model Model_def;
 
+    
+    // Start of the main program
     
     // keyboard input
     std::string keyboard;
+    std::string Model_att_str;
+    std::string Weapon_att_str;
+    std::string Model_def_str;
     
+    std::cout<<std::endl;
+    std::cout<<std::endl;
+    std::cout<<std::endl;
+    std::cout<<std::endl;
+    std::cout<<std::endl;
     std::cout<<"War40K simulater"<<std::endl;
-    std::cout<<"Type 'exit' to end the program"<<std::endl<<std::endl;
+    std::cout<<"Type 'exit' to end the program, type 'sim' to simulate."<<std::endl<<std::endl;
+    
+    // while(keyboard != "exit") {
+    //     std::cin>>keyboard;
+    //     if(keyboard == "sim") {
+    //         std::cout<<"To simulate, type the attacking model, the weapon and then the defending model."<<std::endl;
+    //         std::cin>>Model_att_str;
+    //         std::cin>>Weapon_att_str;
+    //         std::cin>>Model_def_str;
+    //     }
+    // }
 
-    // marine - CCW - Necron.
-    W_attack(Marine,Astartes_chainwsord,Necron,&prob);
-
+    // cin goes here.
+    Model_att_str = "Marine";
+    Weapon_att_str = "CCW";
+    Model_def_str = "Necron";
+    
+    // find if cin are in maps
+    if(Model_map.find(Model_att_str) == Model_map.end()) {
+        std::cout<<"Not found"<<std::endl;
+    }
+    else {
+        Model_att = Marine;
+    }
+    
+    if(Weapon_map.find(Weapon_att_str) == Weapon_map.end()) {
+        std::cout<<"Not found"<<std::endl;
+    }
+    else {
+        Weapon_att = Astartes_chainsword;
+    }
+    
+    if(Model_map.find(Model_def_str) == Model_map.end()) {
+        std::cout<<"Not found"<<std::endl;
+    }
+    else {
+        Model_def = Marine;
+    }
+    
+    // find and cout answers
+    W_attack(Model_att,Astartes_chainsword,Necron,&prob);
     no_of_att = prob[0];
     no_of_hit = prob[1] / 6.0;
     no_of_wou = prob[2] / 36.0;
